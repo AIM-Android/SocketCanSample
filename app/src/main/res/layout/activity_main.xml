@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <TextView style="@style/TitleTextViewStyle"
+        android:id="@+id/send_window"
+        android:text="@string/txt_send_window"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TableRow style="@style/TableRowStyle"
+        android:id="@+id/can_speed_tr"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/send_window">
+
+        <TextView style="@style/RowContentStyle_Data"
+            android:text="@string/txt_can_speed" />
+
+        <Spinner style="@style/SpinnerStyle"
+            android:id="@+id/can_speed_sp"
+            android:entries="@array/can.speeds" />
+    </TableRow>
+
+    <TableRow style="@style/TableRowStyle"
+        android:id="@+id/can_id_tr"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/can_speed_tr">
+
+        <TextView style="@style/RowContentStyle_Data"
+            android:text="@string/txt_can_id" />
+
+        <EditText style="@style/RowContentStyle_EditTextDecimal"
+            android:id="@+id/can_id_edt"
+            android:inputType="numberDecimal"
+            android:hint="@string/hint_can_id" />
+    </TableRow>
+
+    <TableRow style="@style/TableRowStyle"
+        android:id="@+id/can_config_tr"
+        android:gravity="center"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/can_id_tr">
+
+        <Button style="@style/ButtonStyle"
+            android:id="@+id/can_open_btn"
+            android:text="@string/txt_open" />
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/can_data_tr"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:paddingVertical="2dp"
+        app:layout_constraintBottom_toTopOf="@+id/can_send_tr"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/can_config_tr">
+
+        <TextView
+            style="@style/RowContentStyle_Data"
+            android:layout_height="match_parent"
+            android:text="@string/txt_can_data" />
+
+        <EditText style="@style/RowContentStyle_EditTextDecimal"
+            android:id="@+id/can_data_edt"
+            android:maxLength="8"
+            android:layout_height="match_parent"
+            android:hint="@string/hint_can_data" />
+    </TableRow>
+
+    <TableRow style="@style/TableRowStyle"
+        android:id="@+id/can_send_tr"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <Button style="@style/ButtonStyle"
+            android:visibility="gone"
+            android:id="@+id/can_start_btn"
+            android:text="@string/txt_start_receive" />
+
+        <Button style="@style/ButtonStyle"
+            android:id="@+id/can_send_btn"
+            android:text="@string/txt_send" />
+
+        <Button style="@style/ButtonStyle"
+            android:visibility="gone"
+            android:id="@+id/can_close_btn"
+            android:text="@string/txt_close" />
+    </TableRow>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView style="@style/TitleTextViewStyle"
+            android:layout_width="match_parent"
+            android:text="@string/txt_receive_window" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginVertical="2dp"
+            android:layout_marginHorizontal="5dp"
+            android:background="@drawable/edit_background"
+            android:layout_weight="1">
+            <TextView
+                android:id="@+id/receive_tv"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:layout_margin="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </ScrollView>
+
+        <Button style="@style/ButtonStyle"
+            android:id="@+id/clear_btn"
+            android:layout_width="match_parent"
+            android:layout_weight="0"
+            android:text="@string/txt_clear" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

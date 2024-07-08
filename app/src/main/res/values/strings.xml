@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">SocketCanSample</string>
+    <string name="hint_can_id">请输入 can id</string>
+    <string name="hint_can_data">请输入 can data</string>
+    <string name="hint_can_length">请输入 can length</string>
+    <string name="txt_can_port">Can Port :</string>
+    <string name="txt_can_speed">Can Speed :</string>
+    <string name="txt_can_id">Can Id :</string>
+    <string name="txt_can_data">Can Data :</string>
+    <string name="txt_can_length">Can Length :</string>
+    <string name="txt_config">config</string>
+    <string name="txt_open">open</string>
+    <string name="txt_send">send</string>
+    <string name="txt_close">close</string>
+    <string name="txt_send_window">Send Window</string>
+    <string name="txt_receive_window">Receive Window</string>
+    <string name="txt_start_receive">start receive</string>
+    <string name="txt_clear">clear</string>
+    <string name="txt_can0">can0</string>
+</resources>

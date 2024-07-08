@@ -1,0 +1,58 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.advantech.socketcan'
+    compileSdk 33
+
+    defaultConfig {
+        applicationId "com.advantech.socketcan"
+        minSdk 23
+        targetSdk 33
+        versionCode 1
+        versionName "1.0.1"
+
+    }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['jniLibs']
+        }
+    }
+
+    signingConfigs {
+        config {
+            keyAlias 'android'
+            keyPassword 'android'
+            storePassword 'android'
+            storeFile file('../platform.jks')
+            v2SigningEnabled true
+        }
+    }
+    applicationVariants.configureEach { variant ->
+        variant.outputs.configureEach {
+            outputFileName = "SocketCanSample_v${defaultConfig.versionName}_${variant.buildType.name}.apk"
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.config
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+
+    implementation files('libs/libSocketCan.jar')
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+}

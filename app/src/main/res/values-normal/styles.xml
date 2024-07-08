@@ -1,0 +1,25 @@
+<resources>
+    <style name="RowContentStyle_Data" parent="@style/RowContentStyle_Data_Base">
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="RowContentStyle_EditTextDecimal" parent="@style/RowContentStyle_EditTextDecimal_Base">
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="SpinnerStyle" parent="@style/SpinnerStyle_Base">
+    </style>
+
+    <style name="ButtonStyle" parent="@style/ButtonStyle_Base">
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="TitleTextViewStyle" parent="@style/TitleTextViewStyle_Base">
+        <item name="android:textSize">14sp</item>
+        <item name="android:layout_height">32dp</item>
+    </style>
+
+    <style name="TableRowStyle" parent="@style/TableRowStyle_Base">
+        <item name="android:layout_height">32dp</item>
+    </style>
+</resources>
