@@ -6,7 +6,7 @@ libSocketCan SDK 是一组控制 imx8m tpc_1xx 安卓设备 CAN 总线的 API �
 
 libSocketCan SDK 为应用程序提供 API 模块，用于控制 CAN 进行各种操作，该 SDK 的软件栈如下图所示
 
-![image-20240717113412643](/home/zhangjian/Desktop/libSocketCan/images/image-20240718115511123.png)
+![image-20240717113412643](https://github.com/AIM-Android/SocketCanSample/tree/master/images/image-20240718115511123.png)
 
 libSocketCan API 主要包括两个部分
 
@@ -19,13 +19,13 @@ libSocketCan API 主要包括两个部分
 
 我们导入成功 libSocketCan SDK 之后，就可以开始开发我们的 app，具体的使用流程如下图所示
 
-![image-20240717114849850](/home/zhangjian/Desktop/libSocketCan/images/image-20240717114849850.png)
+![image-20240717114849850](https://github.com/AIM-Android/SocketCanSample/tree/master/images/image-20240717114849850.png)
 
 ## 在 Android Studio 中导入 SDK
 
 要使用 application 访问 libSocketCan 的功能，您必须将 libSocketCan.jar 和 libSocketCan.so 导入到您的 AndroidStudio 工程中。对应的目录及配置如下图所示。
 
-![image-20240717105744169](/home/zhangjian/Desktop/libSocketCan/images/image-20240717105744169.png)
+![image-20240717105744169](https://github.com/AIM-Android/SocketCanSample/tree/master/images/image-20240717105744169.png)
 
 
 
