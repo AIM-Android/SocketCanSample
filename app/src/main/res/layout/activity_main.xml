@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_margin="8dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -15,10 +16,32 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TableRow style="@style/TableRowStyle"
-        android:id="@+id/can_speed_tr"
+        android:id="@+id/can_port_tr"
+        android:layout_marginTop="5dp"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/send_window">
+
+        <TextView style="@style/RowContentStyle_Data"
+            android:text="@string/txt_can_port" />
+
+        <TextView style="@style/RowContentStyle_Data"
+            android:layout_weight="2"
+            android:paddingStart="5dp"
+            android:text="can0"
+            tools:ignore="RtlSymmetry" />
+
+        <Spinner style="@style/SpinnerStyle"
+            android:visibility="gone"
+            android:id="@+id/can_port_sp"
+            android:entries="@array/can.interface" />
+    </TableRow>
+
+    <TableRow style="@style/TableRowStyle"
+        android:id="@+id/can_speed_tr"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/can_port_tr">
 
         <TextView style="@style/RowContentStyle_Data"
             android:text="@string/txt_can_speed" />
@@ -39,8 +62,25 @@
 
         <EditText style="@style/RowContentStyle_EditTextDecimal"
             android:id="@+id/can_id_edt"
-            android:inputType="numberDecimal"
+            android:maxLength="4"
+            android:inputType="number"
             android:hint="@string/hint_can_id" />
+    </TableRow>
+
+    <TableRow style="@style/TableRowStyle"
+        android:id="@+id/callback_tr"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/can_id_tr">
+
+        <TextView style="@style/RowContentStyle_Data"
+            android:text="@string/txt_is_callback_mode" />
+
+        <CheckBox
+            android:layout_weight="2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/checkbox_btn" />
     </TableRow>
 
     <TableRow style="@style/TableRowStyle"
@@ -48,7 +88,12 @@
         android:gravity="center"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/can_id_tr">
+        app:layout_constraintTop_toBottomOf="@+id/callback_tr">
+
+        <Button style="@style/ButtonStyle"
+            android:visibility="gone"
+            android:id="@+id/can_config_btn"
+            android:text="@string/txt_config" />
 
         <Button style="@style/ButtonStyle"
             android:id="@+id/can_open_btn"
@@ -60,7 +105,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:paddingVertical="2dp"
-        app:layout_constraintBottom_toTopOf="@+id/can_send_tr"
+        app:layout_constraintBottom_toTopOf="@+id/can_length_tr"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/can_config_tr">
@@ -73,8 +118,33 @@
         <EditText style="@style/RowContentStyle_EditTextDecimal"
             android:id="@+id/can_data_edt"
             android:maxLength="8"
+            android:digits="0123456789ABCDEF"
+            android:inputType="textNoSuggestions|textCapCharacters"
             android:layout_height="match_parent"
             android:hint="@string/hint_can_data" />
+    </TableRow>
+
+    <TextView style="@style/TextViewCountStyle"
+        android:id="@+id/send_count_tv"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/can_data_tr"
+        app:layout_constraintEnd_toStartOf="@+id/guideline" />
+
+    <TableRow style="@style/TableRowStyle"
+        android:id="@+id/can_length_tr"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/can_send_tr"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            style="@style/RowContentStyle_Data"
+            android:text="@string/txt_can_length" />
+
+        <EditText
+            android:id="@+id/can_length_edt"
+            style="@style/RowContentStyle_EditTextDecimal"
+            android:hint="@string/hint_can_length" />
     </TableRow>
 
     <TableRow style="@style/TableRowStyle"
@@ -106,41 +176,57 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.5" />
 
-    <LinearLayout
+    <TextView
+        style="@style/TitleTextViewStyle"
+        android:id="@+id/recv_box_tr"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:text="@string/txt_receive_window"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/send_window"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:paddingVertical="2dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/clear_btn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView style="@style/TitleTextViewStyle"
-            android:layout_width="match_parent"
-            android:text="@string/txt_receive_window" />
+        app:layout_constraintTop_toBottomOf="@+id/recv_box_tr">
 
         <ScrollView
+            android:id="@+id/recv_scrollView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginVertical="2dp"
-            android:layout_marginHorizontal="5dp"
+            android:layout_weight="1"
             android:background="@drawable/edit_background"
-            android:layout_weight="1">
+            android:padding="5dp">
+
             <TextView
                 android:id="@+id/receive_tv"
-                android:textSize="16sp"
-                android:textColor="@color/black"
-                android:textStyle="bold"
-                android:layout_margin="5dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
         </ScrollView>
-
-        <Button style="@style/ButtonStyle"
-            android:id="@+id/clear_btn"
-            android:layout_width="match_parent"
-            android:layout_weight="0"
-            android:text="@string/txt_clear" />
     </LinearLayout>
+
+    <TextView style="@style/TextViewCountStyle"
+        android:id="@+id/recv_count_tv"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/linearLayout"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <Button
+        android:id="@+id/clear_btn"
+        style="@style/ButtonStyle"
+        android:text="@string/txt_clear"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/send_window" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

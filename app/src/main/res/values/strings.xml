@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">SocketCanSample</string>
-    <string name="hint_can_id">请输入 can id</string>
-    <string name="hint_can_data">请输入 can data</string>
+    <string name="app_name">CanTestTool</string>
+    <string name="hint_can_id">请输入 can id，范围(0-2048)</string>
+    <string name="hint_can_data">请输入十六进制(ex:FFFFFFFF)</string>
     <string name="hint_can_length">请输入 can length</string>
     <string name="txt_can_port">Can Port :</string>
     <string name="txt_can_speed">Can Speed :</string>
@@ -16,5 +16,7 @@
     <string name="txt_receive_window">Receive Window</string>
     <string name="txt_start_receive">start receive</string>
     <string name="txt_clear">clear</string>
+    <string name="txt_is_callback_mode">is callback mode</string>
+    <string name="hint__1_100">0/100</string>
     <string name="txt_can0">can0</string>
 </resources>

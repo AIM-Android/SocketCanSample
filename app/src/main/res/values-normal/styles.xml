@@ -22,4 +22,8 @@
     <style name="TableRowStyle" parent="@style/TableRowStyle_Base">
         <item name="android:layout_height">32dp</item>
     </style>
+
+    <style name="TextViewCountStyle" parent="@style/TextViewCountStyle_Base">
+        <item name="android:textSize">12sp</item>
+    </style>
 </resources>
