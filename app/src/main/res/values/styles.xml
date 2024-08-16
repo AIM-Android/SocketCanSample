@@ -1,89 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" xmlns:app="http://schemas.android.com/apk/res-auto">
-
-    <style name="RowContentStyle_Data" parent="@style/RowContentStyle_Data_Base">
-    </style>
-
-    <style name="RowContentStyle_Data_Base">
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">match_parent</item>
-        <item name="android:layout_weight">1</item>
-        <item name="android:gravity">center_vertical</item>
-        <item name="android:textColor">@color/black</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textSize">16sp</item>
-    </style>
-
-    <style name="RowContentStyle_EditTextDecimal" parent="@style/RowContentStyle_EditTextDecimal_Base">
-    </style>
-
-    <style name="RowContentStyle_EditTextDecimal_Base">
-        <item name="android:background">@drawable/edit_background</item>
-        <item name="android:layout_width">0dp</item>
-        <item name="android:paddingStart">2dp</item>
-        <item name="android:layout_height">match_parent</item>
-        <item name="android:layout_weight">2</item>
-        <item name="android:textColor">@color/black</item>
-        <item name="android:textSize">16sp</item>
-        <item name="android:imeOptions">actionDone</item>
-    </style>
-
-    <style name="SpinnerStyle" parent="@style/SpinnerStyle_Base">
-    </style>
-
-    <style name="SpinnerStyle_Base">
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">match_parent</item>
-        <item name="android:layout_weight">2</item>
-        <item name="android:layout_marginRight">5dp</item>
-    </style>
-
-    <style name="ButtonStyle" parent="@style/ButtonStyle_Base">
-    </style>
-
-    <style name="ButtonStyle_Base">
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">36dp</item>
-        <item name="android:layout_weight">1</item>
-        <item name="android:backgroundTint">?android:attr/textColorHint</item>
-        <item name="android:background">@drawable/button_shape</item>
-        <item name="android:textAllCaps">false</item>
-        <item name="android:textColor">@color/white</item>
-        <item name="android:textSize">16sp</item>
-        <item name="android:textStyle">bold</item>
-    </style>
-
-    <style name="TitleTextViewStyle" parent="@style/TitleTextViewStyle_Base">
-    </style>
-
-    <style name="TitleTextViewStyle_Base">
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">42dp</item>
-        <item name="android:background">?android:attr/textColorHint</item>
-        <item name="android:textAllCaps">false</item>
-        <item name="android:gravity">center</item>
-        <item name="android:textColor">@color/black</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textSize">14sp</item>
-    </style>
-
-    <style name="TableRowStyle" parent="@style/TableRowStyle_Base">
-    </style>
-
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="TableRowStyle" parent="TableRowStyle_Base" />
     <style name="TableRowStyle_Base">
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0dp</item>
+    </style>
+
+    <style name="ButtonStyle" parent="ButtonStyle_Base" />
+    <style name="ButtonStyle_Base">
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0dp</item>
+    </style>
+
+    <style name="TitleTextViewStyle" parent="TitleTextViewStyle_Base" />
+    <style name="TitleTextViewStyle_Base">
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0dp</item>
+    </style>
+
+    <style name="EditTextStyle" parent="EditTextStyle_Base" />
+    <style name="EditTextStyle_Base">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:layout_weight">2</item>
         <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">42dp</item>
+        <item name="android:layout_height">match_parent</item>
     </style>
 
-    <style name="TextViewCountStyle" parent="@style/TextViewCountStyle_Base">
+    <style name="ItemTextViewTitle" parent="ItemTextViewTitle_Base" />
+    <style name="ItemTextViewTitle_Base">
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
     </style>
 
-    <style name="TextViewCountStyle_Base">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginBottom">2dp</item>
-        <item name="android:hint">@string/hint__1_100</item>
-        <item name="android:textSize">14sp</item>
+    <style name="CheckBoxStyle" parent="CheckBoxStyle_Base" />
+    <style name="CheckBoxStyle_Base">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0dp</item>
     </style>
 
+    <style name="ViewStyle">
+        <item name="android:background">@color/black</item>
+        <item name="android:layout_marginHorizontal" tools:targetApi="o">4dp</item>
+        <item name="android:layout_width">1dp</item>
+        <item name="android:layout_height">match_parent</item>
+    </style>
+
+    <style name="SpinnerStyle" parent="SpinnerStyle_Base" />
+    <style name="SpinnerStyle_Base">
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:layout_weight">2</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+    </style>
 </resources>

@@ -1,259 +1,276 @@
 package com.advantech.socketcan;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.ResultReceiver;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ScrollView;
+import android.widget.ListView;
 import android.widget.Spinner;
-import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.Nullable;
 
-import java.io.IOException;
+import com.advantech.socketcan.adapter.ResultAdapter;
+import com.advantech.socketcan.baseui.BaseActivity;
+import com.advantech.socketcan.CanFrame;
+import com.advantech.socketcan.Mask;
+import com.advantech.socketcan.OnFrameDataReceivedListener;
+import com.advantech.socketcan.SocketCan;
+
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener,
+        AdapterView.OnItemSelectedListener,
+        CompoundButton.OnCheckedChangeListener {
 
-    private static final String TAG = "CanTestTool";
+    private static final String TAG = "SocketCanSample";
 
-    private static final String CAN_PORT = "can0";
-    private static final String CAN_SPEED = "persist.sys.can_speed";
+    private Button openCanButton, sendDataButton, setMaskFilterButton, clearResultButton;
+    private EditText canIdEdittext, canDataEdittext;
+    private CheckBox isCallBackModeCbx, isExtendedCbx, isRemoteCbx;
+    private Spinner baudrateSpinner;
+    private ListView resultListView;
 
-    private TextView receiveTextView;
-    private Button openButton, sendButton, clearButton;
-    private Spinner canSpeedSpinner;
-    private EditText canidEdittext, candataEdittext;
-    private CheckBox checkBox;
+    private ResultAdapter adapter;
+    private List<CanFrame> canFrames;
 
-    private String mCanX;
-    private String[] mCanSpeedArray;
-    private String mSpeed;
+    private boolean isOpened;
 
-    private SocketCan socketCan;
-    private RecvCanDataThread thread;
-    private OnFrameDataReceivedListener mListener;
+    private String[] baudrateArray;
 
-    private boolean isCanOpen;
-    private int sendCount = 0;
-    private int recvCount = 0;
-    private TextView sendCountTv, recvCountTv;
-    private ScrollView scrollView;
+    private SocketCan socketCan0;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        initStringArray();
-        mCanX = CAN_PORT;
-        initView();
-    }
+    private String baudrate;
+
+    private ReadingThread thread;
+
+    private OnFrameDataReceivedListener onFrameDataReceivedListener;
+
+    private SocketCanManager manager;
 
     private OnFrameDataReceivedListener listener = new OnFrameDataReceivedListener() {
         @Override
         public void onDataReceived(CanFrame canFrame) {
-            update(canFrame);
+            updateResult(canFrame);
         }
     };
 
-    private void initStringArray() {
-        mCanSpeedArray = getResources().getStringArray(R.array.can_speeds);
+    @Override
+    protected int getLayoutResID() {
+        return R.layout.activity_main;
     }
 
-    private void initView() {
-        scrollView = findViewById(R.id.recv_scrollView);
-        receiveTextView = findViewById(R.id.receive_tv);
-        openButton = findViewById(R.id.can_open_btn);
-        sendButton = findViewById(R.id.can_send_btn);
-        clearButton = findViewById(R.id.clear_btn);
+    @Override
+    protected void initView(Bundle savedInstanceState) {
+        openCanButton = findViewById(R.id.open_btn);
+        openCanButton.setOnClickListener(this);
+        sendDataButton = findViewById(R.id.send_btn);
+        sendDataButton.setOnClickListener(this);
+        setMaskFilterButton = findViewById(R.id.setmask_btn);
+        setMaskFilterButton.setOnClickListener(this);
+        clearResultButton = findViewById(R.id.clear_btn);
+        clearResultButton.setOnClickListener(this);
 
-        openButton.setOnClickListener(this);
-        sendButton.setOnClickListener(this);
-        clearButton.setOnClickListener(this);
+        canIdEdittext = findViewById(R.id.canid_edt);
+        canDataEdittext = findViewById(R.id.candata_edt);
 
-        canSpeedSpinner = findViewById(R.id.can_speed_sp);
-        canSpeedSpinner.setSelection(0);
-        canSpeedSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                mSpeed = mCanSpeedArray[position];
-            }
+        baudrateSpinner = findViewById(R.id.baudrate_sp);
+        baudrateSpinner.setOnItemSelectedListener(this);
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
+        isCallBackModeCbx = findViewById(R.id.callback_cbx);
+        isCallBackModeCbx.setOnCheckedChangeListener(this);
+        isExtendedCbx = findViewById(R.id.extended_cbx);
+        isRemoteCbx = findViewById(R.id.remote_cbx);
 
-            }
-        });
+        resultListView = findViewById(R.id.result_list_lv);
+    }
 
-        canidEdittext = findViewById(R.id.can_id_edt);
-        candataEdittext = findViewById(R.id.can_data_edt);
+    @Override
+    protected void initData() {
+        baudrateArray = getResources().getStringArray(R.array.can_speeds);
+        adapter = new ResultAdapter(this);
+        canFrames = new ArrayList<>();
+    }
 
-        checkBox = findViewById(R.id.checkbox_btn);
-        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Log.d(TAG, "checkbox");
-                mListener = isChecked ? listener : null;
-                sendCount = 0;
-                recvCount = 0;
-            }
-        });
-
-        sendCountTv = findViewById(R.id.send_count_tv);
-        recvCountTv = findViewById(R.id.recv_count_tv);
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        onFrameDataReceivedListener = isChecked ? listener : null;
     }
 
     @Override
     public void onClick(View v) {
-        if (R.id.can_open_btn == v.getId()) {
-            if ("open".equals(openButton.getText())) {
-                openCan();
+        if (R.id.open_btn == v.getId()) {
+            if ("openCan".equals(openCanButton.getText())) {
+                open();
             } else {
-                closeCan();
+                close();
             }
-        } else if (R.id.can_send_btn == v.getId()) {
-            // send
-            sendCanData();
+        } else if (R.id.send_btn == v.getId()) {
+            send();
+        } else if (R.id.setmask_btn == v.getId()) {
+            if (isOpened) {
+                setFilter();
+            } else {
+                showToast("please open can.");
+            }
         } else if (R.id.clear_btn == v.getId()) {
-            receiveTextView.setText("");
+            canFrames.clear();
+            adapter.notifyDataSetChanged();
+            socketCan0.removeMaskFilter(123);
         }
     }
 
-    private void closeCan() {
-        Log.d(TAG, "SocketCan : " + socketCan.toString());
-        isCanOpen = false;
-        canidEdittext.setEnabled(true);
-        checkBox.setEnabled(true);
-        canSpeedSpinner.setEnabled(true);
-        openButton.setText("open");
-        receiveTextView.setText("");
-        sendCount = 0;
-        recvCount = 0;
-        sendCountTv.setText(getString(R.string.hint__1_100));
-        recvCountTv.setText(getString(R.string.hint__1_100));
-        if (socketCan != null) {
-            Log.d(TAG, "close : " + socketCan.close());
-            socketCan = null;
+    private void setFilter() {
+        Intent intent = new Intent(MainActivity.this, MaskFilterActivity.class);
+        intent.putExtra("isExtended", isExtendedCbx.isChecked());
+        startActivity(intent);
+    }
+
+    private void open() {
+        manager = SocketCanManager.getInstance(this, onFrameDataReceivedListener);
+//        socketCan0 = new SocketCan(this, onFrameDataReceivedListener);
+        socketCan0 = manager.getSocketCan();
+        int result = socketCan0.open(0, baudrate);
+        if (result == -1) {
+            showToast("failed open can0.");
+        } else {
+            isOpened = true;
+            isCallBackModeCbx.setEnabled(false);
+            baudrateSpinner.setEnabled(false);
+            openCanButton.setText("closeCan");
+            showToast("open can0 success.");
+            if (onFrameDataReceivedListener == null) {
+                if (thread == null) {
+                    thread = new ReadingThread();
+                }
+                if (!thread.isAlive()) {
+                    thread.start();
+                }
+            }
         }
+    }
+
+    private void close() {
+        if (socketCan0 == null) {
+            return;
+        }
+        socketCan0.close();
+        isOpened = false;
+        isCallBackModeCbx.setEnabled(true);
+        baudrateSpinner.setEnabled(true);
+        openCanButton.setText("openCan");
+        socketCan0 = null;
         if (thread != null) {
             thread.interrupt();
             thread = null;
         }
-    }
-
-    private void openCan() {
-        if (TextUtils.isEmpty(canidEdittext.getText())) {
-            ToastUtil.show(this, "can id is empty.", Gravity.CENTER, 0);
-            return;
-        }
-        if (!canidEdittext.getText().toString().toUpperCase().matches("[0-9]+")) {
-            ToastUtil.show(this, "CAN ID FORMAT ERROR.", Gravity.CENTER, 0);
-            return;
-        }
-        int canid = Integer.parseInt(canidEdittext.getText().toString().toUpperCase());
-        if (canid > 2048 || canid < 0) {
-            ToastUtil.show(this, "ID FORMAT ERROR.", Gravity.CENTER, 0);
-            return;
-        }
-        if (socketCan == null) {
-            socketCan = new SocketCan(this, mListener);
-        }
-        int reault = socketCan.open(0, mSpeed);
-        if (reault == -1) {
-            ToastUtil.show(this, "open " + mCanX + " fail.", Gravity.CENTER, 0);
-        } else {
-            canidEdittext.setEnabled(false);
-            checkBox.setEnabled(false);
-            canSpeedSpinner.setEnabled(false);
-            isCanOpen = true;
-            openButton.setText("close");
-            ToastUtil.show(this, "open " + mCanX + " succ.", Gravity.CENTER, 0);
-            if (mListener == null) {
-                startReceiveThread();
-            }
+        if (manager != null) {
+            manager.destroy();
+            manager = null;
         }
     }
 
-    private void sendCanData() {
-        if (TextUtils.isEmpty(canidEdittext.getText())) {
-            ToastUtil.show(this, "can id is empty.", Gravity.CENTER, 0);
-            return;
-        }
-        if (TextUtils.isEmpty(candataEdittext.getText())) {
-            ToastUtil.show(this, "can data is empty.", Gravity.CENTER, 0);
-            return;
-        }
-
-        if (!candataEdittext.getText().toString().toUpperCase().matches("[0-9a-fA-F]+")) {
-            ToastUtil.show(this, "DATA FORMAT ERROR.", Gravity.CENTER, 0);
-            return;
-        }
-        int canid = StringUtils.HexToInt(canidEdittext.getText().toString());
-        if (isCanOpen) {
-            byte[] arr = candataEdittext.getText().toString().getBytes(StandardCharsets.UTF_8);
-            int result = socketCan.send(new CanFrame(canid, arr, arr.length));
-            if (result > 0) {
-                sendCount++;
-                sendCountTv.setText(sendCount + "/100");
-                ToastUtil.show(this, "can data send succ.", Gravity.CENTER, 0);
-            } else {
-                ToastUtil.show(this, "can data send fail.", Gravity.CENTER, 0);
-            }
-        } else {
-            ToastUtil.show(this, "please open can.", Gravity.CENTER, 0);
-        }
-    }
-
-    private void startReceiveThread() {
-        if (thread == null) {
-            thread = new RecvCanDataThread();
-        }
-        if (!thread.isAlive()) {
-            thread.start();
-        }
-    }
-
-    private class RecvCanDataThread extends Thread {
+    private class ReadingThread extends Thread {
         @Override
         public void run() {
-            while (isCanOpen && mListener == null) {
-                Log.d(TAG, "RecvCanDataThread is running.");
-                onDataReceived(socketCan.recv());
+            while (isOpened && onFrameDataReceivedListener == null) {
+                updateResult(socketCan0.recv());
             }
         }
     }
 
-    private void onDataReceived(CanFrame canFrame) {
-        update(canFrame);
-    }
-
-    private void update(CanFrame canFrame) {
+    private void updateResult(CanFrame canFrame) {
         if (canFrame == null) {
             return;
         }
-        String data = new String(canFrame.getData(), StandardCharsets.UTF_8);
-        if (data.length() <= 0) {
-            return;
-        }
-        recvCount++;
+        Log.d(TAG, "updateResult : " + canFrame.toString());
+        canFrames.add(canFrame);
+        adapter.setDataList(canFrames);
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                recvCountTv.setText(recvCount + "/100");
-                receiveTextView.append(data + "\n");
-                receiveTextView.postDelayed(new Runnable() {
+                resultListView.setAdapter(adapter);
+                resultListView.post(new Runnable() {
                     @Override
                     public void run() {
-                        scrollView.fullScroll(View.FOCUS_DOWN);
+                        resultListView.setSelection(resultListView.getCount() - 1);
                     }
-                }, 100);
+                });
             }
         });
+    }
+
+    private void send() {
+        String canidStr = canIdEdittext.getText().toString().toLowerCase();
+        if (TextUtils.isEmpty(canidStr)) {
+            showToast("canid is null.");
+            return;
+        }
+        if (!canidStr.matches("[0-9]+")) {
+            showToast("canid format error.");
+            return;
+        }
+        String dataStr = canDataEdittext.getText().toString();
+        if (TextUtils.isEmpty(dataStr)) {
+            showToast("can data is empty.");
+            return;
+        }
+
+        if ((dataStr.length() > 8)) {
+            showToast("can data length is more than 8.");
+            return;
+        }
+
+        int canid = 0;
+        try {
+            canid = Integer.parseInt(canidStr);
+        } catch (NumberFormatException e) {
+            showToast(e.getMessage() + " > 2147483647");
+            return;
+        }
+        if (!isExtendedCbx.isChecked() && canid > 2047) {
+            showToast("can id is error.");
+            return;
+        }
+        if (canid > 536870911) {
+            showToast("can id is error.");
+            return;
+        }
+        byte[] data = dataStr.getBytes(StandardCharsets.UTF_8);
+        CanFrame canFrame = new CanFrame(canid, data, data.length, isExtendedCbx.isChecked(), isRemoteCbx.isChecked());
+        if (isOpened) {
+            int result = socketCan0.send(canFrame);
+            if (result > 0) {
+                showToast("send can data success.");
+            } else {
+                showToast("send can data fail.");
+            }
+        } else {
+            showToast("please open can.");
+        }
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        baudrate = baudrateArray[position];
+        Log.d(TAG, "can baudrate : " + baudrate);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 }

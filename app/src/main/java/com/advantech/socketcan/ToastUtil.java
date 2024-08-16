@@ -71,4 +71,10 @@ public class ToastUtil {
         toast.setView(toastView);
         toast.show();
     }
+
+    public static void cancel() {
+        if (toast != null) {
+            toast.cancel();
+        }
+    }
 }
