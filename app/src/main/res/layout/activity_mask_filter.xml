@@ -27,6 +27,8 @@
 
                 <EditText style="@style/EditTextStyle"
                     android:id="@+id/filterId1_edt"
+                    android:maxLength="8"
+                    android:inputType="number"
                     android:hint="@string/hint_123"/>
             </TableRow>
 
@@ -46,6 +48,8 @@
                     android:text="@string/txt_filterid2" />
 
                 <EditText style="@style/EditTextStyle"
+                    android:maxLength="8"
+                    android:inputType="number"
                     android:id="@+id/filterId2_edt" />
             </TableRow>
 
@@ -68,6 +72,8 @@
                     android:text="@string/txt_filterid" />
 
                 <EditText style="@style/EditTextStyle"
+                    android:maxLength="8"
+                    android:inputType="number"
                     android:id="@+id/filterId_edt"/>
             </TableRow>
 

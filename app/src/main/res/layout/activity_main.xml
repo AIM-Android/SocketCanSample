@@ -58,6 +58,8 @@
 
                 <EditText style="@style/EditTextStyle"
                     android:id="@+id/canid_edt"
+                    android:maxLength="8"
+                    android:inputType="number"
                     android:hint="@string/hint_4" />
             </TableRow>
 
@@ -90,10 +92,16 @@
                 android:gravity="center"
                 android:text="@string/txt_receive_box" />
 
+            <include layout="@layout/title_item_result"
+                android:layout_marginHorizontal="4dp"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp" />
+
             <ListView
                 android:id="@+id/result_list_lv"
                 android:layout_margin="4dp"
-                android:layout_weight="8"
+                android:layout_weight="7"
                 android:layout_width="match_parent"
                 android:layout_height="0dp" />
 

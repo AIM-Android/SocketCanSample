@@ -2,6 +2,7 @@ package com.advantech.socketcan;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -72,65 +73,66 @@ public class MaskFilterActivity extends BaseActivity implements View.OnClickList
             filterId2Edittext.setText(String.valueOf(mask.getFilterId2()));
             mask2Edittext.setText(Integer.toHexString(mask.getMask2()).toUpperCase());
         }
-
-//        Bundle bundle = getIntent().getExtras();
-//        isExtended = bundle.getBoolean("isExtended");
-//        maskMap = (Map<Integer, Mask>) bundle.getSerializable("maskMap");
-//        for (Map.Entry<Integer, Mask> entry : maskMap.entrySet()) {
-//            Mask mask = (Mask) entry.getValue();
-//            if (mask.isGroup1Valid()) {
-//                filterId1Edittext.setText(String.valueOf(mask.getFilterId1()));
-//                mask1Edittext.setText(Integer.toHexString(mask.getMask1()).toUpperCase());
-//            }
-//
-//            if (mask.isGroup2Valid()) {
-//                filterId2Edittext.setText(String.valueOf(mask.getFilterId2()));
-//                mask2Edittext.setText(Integer.toHexString(mask.getMask2()).toUpperCase());
-//            }
-//        }
     }
 
     @Override
     public void onClick(View v) {
         if (R.id.set_tv == v.getId()) {
-            Mask mask = new Mask();
-            String filterId1Str = filterId1Edittext.getText().toString().toLowerCase();
-            String mask1Str = mask1Edittext.getText().toString().toLowerCase();
-            String filterId2Str = filterId2Edittext.getText().toString().toLowerCase();
-            String mask2Str = mask2Edittext.getText().toString().toLowerCase();
-            if (!TextUtils.isEmpty(filterId1Str) && !TextUtils.isEmpty(mask1Str)) {
-                int filterId1 = Integer.parseInt(filterId1Str);
-                int mask1 = Integer.parseInt(mask1Str, 16);
-                mask.setFilterId1(filterId1);
-                mask.setMask1(mask1);
-            }
-
-            if (!TextUtils.isEmpty(filterId2Str) && !TextUtils.isEmpty(mask2Str)) {
-                int filterId2 = Integer.parseInt(filterId2Str);
-                int mask2 = Integer.parseInt(mask2Str, 16);
-                mask.setFilterId2(filterId2);
-                mask.setMask2(mask2);
-            }
-            socketCan0.setMaskFilter(mask);
+            setMaskFilter();
         } else if (R.id.get_tv == v.getId()) {
-//            if (!TextUtils.isEmpty(filterIdEdittext.getText())) {
-//                int filterId = Integer.parseInt(filterIdEdittext.getText().toString());
-//                Mask result = socketCan0.getMaskFilter(filterId);
-//                if (result != null) {
-//                    resultTextView.setText(result.toString());
-//                }
-//            }
+            getMaskFilter();
         } else if (R.id.remove_tv == v.getId()) {
             if (!TextUtils.isEmpty(filterIdEdittext.getText())) {
                 int filterId = Integer.parseInt(filterIdEdittext.getText().toString());
-                socketCan0.removeMaskFilter(filterId);
-                updateResult();
+                Log.d(TAG, "removeMaskFilter result : " + socketCan0.removeMaskFilter(filterId));
+            } else {
+                showToast("filterId is null.");
             }
         } else if (R.id.reset_tv == v.getId()) {
-            socketCan0.clearAndResetMaskFilter();
-//            updateResult();
+            Log.d(TAG, "clearAndResetMaskFilter result : " + socketCan0.clearAndResetMaskFilter());
+            filterId1Edittext.setText("");
+            mask1Edittext.setText("");
+            filterId2Edittext.setText("");
+            mask2Edittext.setText("");
         }
     }
 
-    private void updateResult() {}
+    private void setMaskFilter() {
+        Mask mask = new Mask();
+        String filterId1Str = filterId1Edittext.getText().toString();
+        String mask1Str = mask1Edittext.getText().toString();
+        String filterId2Str = filterId2Edittext.getText().toString();
+        String mask2Str = mask2Edittext.getText().toString();
+        if (!TextUtils.isEmpty(filterId1Str) && !TextUtils.isEmpty(mask1Str)) {
+            int filterId1 = StringUtil.HexToInt(filterId1Str);
+            int mask1 = StringUtil.HexToInt(mask1Str, 16);
+            Log.d(TAG, mask1 + "");
+            mask.setFilterId1(filterId1);
+            mask.setMask1(mask1);
+        }
+
+        if (!TextUtils.isEmpty(filterId2Str) && !TextUtils.isEmpty(mask2Str)) {
+            int filterId2 = StringUtil.HexToInt(filterId2Str);
+            int mask2 = StringUtil.HexToInt(mask2Str, 16);
+            mask.setFilterId2(filterId2);
+            mask.setMask2(mask2);
+        }
+        socketCan0.setMaskFilter(mask);
+    }
+
+    private void getMaskFilter() {
+        if (!TextUtils.isEmpty(filterIdEdittext.getText())) {
+            int filterId = StringUtil.HexToInt(filterIdEdittext.getText().toString());
+            Mask result = socketCan0.getAllMaskFilter();
+            if (result != null) {
+                if (filterId == result.getFilterId1()) {
+                    resultTextView.setText(String.valueOf(result.getMask1()));
+                } else if (filterId == result.getFilterId2()) {
+                    resultTextView.setText(String.valueOf(result.getMask2()));
+                }
+            } else {
+                showToast("filterId is null.");
+            }
+        }
+    }
 }
