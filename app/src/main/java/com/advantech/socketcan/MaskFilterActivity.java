@@ -9,6 +9,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.advantech.socketcan.adapter.MaskResultAdapter;
 import com.advantech.socketcan.baseui.BaseActivity;
 
 import java.util.ArrayList;
@@ -25,8 +26,12 @@ public class MaskFilterActivity extends BaseActivity implements View.OnClickList
     private TextView resultTextView;
 
     private SocketCan socketCan0;
-    private Map<Integer, Mask> maskMap;
     private boolean isExtended;
+
+    private ListView listView;
+    private MaskResultAdapter adapter;
+
+    List<MaskBean> dataList;
 
 
     @Override
@@ -53,48 +58,73 @@ public class MaskFilterActivity extends BaseActivity implements View.OnClickList
         filterIdEdittext = findViewById(R.id.filterId_edt);
 
         resultTextView = findViewById(R.id.mask_result_tv);
+        listView = findViewById(R.id.mask_result_list_lv);
     }
 
     @Override
     protected void initData() {
-        maskMap = new HashMap<>();
         SocketCanManager manager = SocketCanManager.getInstance(this, null);
         socketCan0 = manager.getSocketCan();
+        adapter = new MaskResultAdapter(this);
+        dataList = new ArrayList<>();
 
         Mask mask = socketCan0.getAllMaskFilter();
         if (mask == null) {
             return;
         }
-        if (mask.getFilterId1() != -1) {
+        if (mask.isGroup1Valid()) {
             filterId1Edittext.setText(String.valueOf(mask.getFilterId1()));
             mask1Edittext.setText(Integer.toHexString(mask.getMask1()).toUpperCase());
         }
-        if (mask.getFilterId2() != -1) {
+        if (mask.isGroup2Valid()) {
             filterId2Edittext.setText(String.valueOf(mask.getFilterId2()));
             mask2Edittext.setText(Integer.toHexString(mask.getMask2()).toUpperCase());
         }
+        listView.setAdapter(adapter);
+        update();
     }
 
     @Override
     public void onClick(View v) {
         if (R.id.set_tv == v.getId()) {
             setMaskFilter();
+            update();
+            showToast("set OK");
         } else if (R.id.get_tv == v.getId()) {
             getMaskFilter();
+            showToast("get OK");
         } else if (R.id.remove_tv == v.getId()) {
             if (!TextUtils.isEmpty(filterIdEdittext.getText())) {
                 int filterId = Integer.parseInt(filterIdEdittext.getText().toString());
                 Log.d(TAG, "removeMaskFilter result : " + socketCan0.removeMaskFilter(filterId));
+                update();
+                showToast("remove OK");
             } else {
                 showToast("filterId is null.");
             }
         } else if (R.id.reset_tv == v.getId()) {
             Log.d(TAG, "clearAndResetMaskFilter result : " + socketCan0.clearAndResetMaskFilter());
-            filterId1Edittext.setText("");
-            mask1Edittext.setText("");
-            filterId2Edittext.setText("");
-            mask2Edittext.setText("");
+            dataList.clear();
+            adapter.notifyDataSetChanged();
+            showToast("reset OK");
         }
+    }
+
+    private void update() {
+        Mask result = socketCan0.getAllMaskFilter();
+        dataList.clear();
+        if (result == null) {
+            return;
+        }
+        if (result.isGroup1Valid()) {
+            dataList.add(new MaskBean(result.getFilterId1(), result.getMask1()));
+        }
+
+        if (result.isGroup2Valid()) {
+            dataList.add(new MaskBean(result.getFilterId2(), result.getMask2()));
+        }
+        adapter.setDataList(dataList);
+        listView.setAdapter(adapter);
     }
 
     private void setMaskFilter() {
@@ -106,9 +136,10 @@ public class MaskFilterActivity extends BaseActivity implements View.OnClickList
         if (!TextUtils.isEmpty(filterId1Str) && !TextUtils.isEmpty(mask1Str)) {
             int filterId1 = StringUtil.HexToInt(filterId1Str);
             int mask1 = StringUtil.HexToInt(mask1Str, 16);
-            Log.d(TAG, mask1 + "");
             mask.setFilterId1(filterId1);
             mask.setMask1(mask1);
+        } else {
+            showToast("filterId1 is null");
         }
 
         if (!TextUtils.isEmpty(filterId2Str) && !TextUtils.isEmpty(mask2Str)) {
@@ -116,6 +147,8 @@ public class MaskFilterActivity extends BaseActivity implements View.OnClickList
             int mask2 = StringUtil.HexToInt(mask2Str, 16);
             mask.setFilterId2(filterId2);
             mask.setMask2(mask2);
+        } else {
+            showToast("filterId2 is null");
         }
         socketCan0.setMaskFilter(mask);
     }
@@ -130,9 +163,9 @@ public class MaskFilterActivity extends BaseActivity implements View.OnClickList
                 } else if (filterId == result.getFilterId2()) {
                     resultTextView.setText(String.valueOf(result.getMask2()));
                 }
-            } else {
-                showToast("filterId is null.");
             }
+        } else {
+            showToast("filterId is null.");
         }
     }
 }

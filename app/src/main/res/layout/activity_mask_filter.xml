@@ -117,10 +117,15 @@
                 android:gravity="center"
                 android:text="maskFilterResult box" />
 
+            <include layout="@layout/title_item_mask_result"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp" />
+
             <ListView
                 android:id="@+id/mask_result_list_lv"
                 android:layout_margin="4dp"
-                android:layout_weight="8"
+                android:layout_weight="7"
                 android:layout_width="match_parent"
                 android:layout_height="0dp" />
         </LinearLayout>

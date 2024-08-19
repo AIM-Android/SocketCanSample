@@ -129,7 +129,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,
         } else if (R.id.clear_btn == v.getId()) {
             canFrames.clear();
             adapter.notifyDataSetChanged();
-            socketCan0.removeMaskFilter(123);
         }
     }
 

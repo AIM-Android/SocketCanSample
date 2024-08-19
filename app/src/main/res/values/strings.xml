@@ -34,4 +34,6 @@
     <string name="item_title_data">data</string>
     <string name="item_title_is_extended">extend</string>
     <string name="item_title_is_remote">remote</string>
+    <string name="title_filter_id">filter id</string>
+    <string name="title_mask">mask</string>
 </resources>
