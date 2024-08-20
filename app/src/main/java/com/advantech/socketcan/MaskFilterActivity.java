@@ -63,6 +63,7 @@ public class MaskFilterActivity extends BaseActivity implements View.OnClickList
 
     @Override
     protected void initData() {
+        isExtended = getIntent().getBooleanExtra("isExtended", false);
         SocketCanManager manager = SocketCanManager.getInstance(this, null);
         socketCan0 = manager.getSocketCan();
         adapter = new MaskResultAdapter(this);
@@ -88,11 +89,8 @@ public class MaskFilterActivity extends BaseActivity implements View.OnClickList
     public void onClick(View v) {
         if (R.id.set_tv == v.getId()) {
             setMaskFilter();
-            update();
-            showToast("set OK");
         } else if (R.id.get_tv == v.getId()) {
             getMaskFilter();
-            showToast("get OK");
         } else if (R.id.remove_tv == v.getId()) {
             if (!TextUtils.isEmpty(filterIdEdittext.getText())) {
                 int filterId = Integer.parseInt(filterIdEdittext.getText().toString());
@@ -138,8 +136,9 @@ public class MaskFilterActivity extends BaseActivity implements View.OnClickList
             int mask1 = StringUtil.HexToInt(mask1Str, 16);
             mask.setFilterId1(filterId1);
             mask.setMask1(mask1);
-        } else {
-            showToast("filterId1 is null");
+            if (!checkId(mask.getFilterId1())) {
+                return;
+            }
         }
 
         if (!TextUtils.isEmpty(filterId2Str) && !TextUtils.isEmpty(mask2Str)) {
@@ -147,10 +146,28 @@ public class MaskFilterActivity extends BaseActivity implements View.OnClickList
             int mask2 = StringUtil.HexToInt(mask2Str, 16);
             mask.setFilterId2(filterId2);
             mask.setMask2(mask2);
-        } else {
-            showToast("filterId2 is null");
+            if (!checkId(mask.getFilterId2())) {
+                return;
+            }
+        }
+        if (!mask.isGroup1Valid() && !mask.isGroup2Valid()) {
+            return;
         }
         socketCan0.setMaskFilter(mask);
+        update();
+        showToast("set OK");
+    }
+
+    private boolean checkId(int filterId) {
+        if (!isExtended && (filterId < 0 || filterId > 0x7FF)) {
+            showToast("can id is error. out of range [0-2047]");
+            return false;
+        }
+        if (isExtended && (filterId < 0 || filterId > 0x1FFFFFFF)) {
+            showToast("can id is error.out of range [0-536870911]");
+            return false;
+        }
+        return true;
     }
 
     private void getMaskFilter() {
@@ -163,6 +180,7 @@ public class MaskFilterActivity extends BaseActivity implements View.OnClickList
                 } else if (filterId == result.getFilterId2()) {
                     resultTextView.setText(String.valueOf(result.getMask2()));
                 }
+                showToast("get OK");
             }
         } else {
             showToast("filterId is null.");

@@ -85,6 +85,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,
         clearResultButton.setOnClickListener(this);
 
         canIdEdittext = findViewById(R.id.canid_edt);
+        canIdEdittext.setHint("0~2047");
         canDataEdittext = findViewById(R.id.candata_edt);
 
         baudrateSpinner = findViewById(R.id.baudrate_sp);
@@ -93,6 +94,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,
         isCallBackModeCbx = findViewById(R.id.callback_cbx);
         isCallBackModeCbx.setOnCheckedChangeListener(this);
         isExtendedCbx = findViewById(R.id.extended_cbx);
+        isExtendedCbx.setOnCheckedChangeListener(this);
         isRemoteCbx = findViewById(R.id.remote_cbx);
 
         resultListView = findViewById(R.id.result_list_lv);
@@ -107,7 +109,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        onFrameDataReceivedListener = isChecked ? listener : null;
+        if (R.id.callback_cbx == buttonView.getId()) {
+            onFrameDataReceivedListener = isChecked ? listener : null;
+        } else if (R.id.extended_cbx == buttonView.getId()) {
+            canIdEdittext.setHint(isChecked ? "0～536870911" : "0~2047");
+        }
     }
 
     @Override
@@ -240,8 +246,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,
             showToast(e.getMessage() + " > 2147483647");
             return;
         }
-        if (!isExtendedCbx.isChecked() && canid > 2047) {
-            showToast("can id is error.");
+        if (!isExtendedCbx.isChecked() && canid > 0x7FF) {
+            showToast("can id is error. out of range [0-2047]");
+            return;
+        }
+        if (isExtendedCbx.isChecked() && canid > 0x1FFFFFFF) {
+            showToast("can id is error.out of range [0-536870911]");
             return;
         }
         if (canid > 536870911) {
