@@ -26,7 +26,7 @@ android {
     }
     applicationVariants.configureEach { variant ->
         variant.outputs.configureEach {
-            outputFileName = "SocketCanSample_v${defaultConfig.versionName}_${variant.buildType.name}.apk"
+            outputFileName = "CanTestTool_v${defaultConfig.versionName}_${variant.buildType.name}.apk"
         }
     }
 
