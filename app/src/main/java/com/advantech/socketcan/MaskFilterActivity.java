@@ -94,9 +94,14 @@ public class MaskFilterActivity extends BaseActivity implements View.OnClickList
         } else if (R.id.remove_tv == v.getId()) {
             if (!TextUtils.isEmpty(filterIdEdittext.getText())) {
                 int filterId = Integer.parseInt(filterIdEdittext.getText().toString());
-                Log.d(TAG, "removeMaskFilter result : " + socketCan0.removeMaskFilter(filterId));
-                update();
-                showToast("remove OK");
+                int result = socketCan0.removeMaskFilter(filterId);
+                Log.d(TAG, "removeMaskFilter result : " + result);
+                if (result >= 0) {
+                    update();
+                    showToast("remove OK");
+                } else {
+                    showToast("remove error");
+                }
             } else {
                 showToast("filterId is null.");
             }
@@ -181,6 +186,8 @@ public class MaskFilterActivity extends BaseActivity implements View.OnClickList
                     resultTextView.setText(String.valueOf(result.getMask2()));
                 }
                 showToast("get OK");
+            } else {
+                showToast("get result is null");
             }
         } else {
             showToast("filterId is null.");
