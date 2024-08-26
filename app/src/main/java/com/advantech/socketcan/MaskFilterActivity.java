@@ -1,6 +1,7 @@
 package com.advantech.socketcan;
 
 import android.os.Bundle;
+import android.text.InputFilter;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -71,6 +72,11 @@ public class MaskFilterActivity extends BaseActivity implements View.OnClickList
 
         filterId1Edittext.setHint(isExtended ? "0～1FFFFFFF" : "0-7FF");
         filterId2Edittext.setHint(isExtended ? "0～1FFFFFFF" : "0-7FF");
+        filterIdEdittext.setHint(isExtended ? "0～1FFFFFFF" : "0-7FF");
+
+        filterId1Edittext.setFilters(new InputFilter[] {new InputFilter.LengthFilter(isExtended ? 8 : 3)});
+        filterId2Edittext.setFilters(new InputFilter[] {new InputFilter.LengthFilter(isExtended ? 8 : 3)});
+        filterIdEdittext.setFilters(new InputFilter[] {new InputFilter.LengthFilter(isExtended ? 8 : 3)});
 
         Mask mask = socketCan0.getAllMaskFilter();
         if (mask == null) {
@@ -96,14 +102,14 @@ public class MaskFilterActivity extends BaseActivity implements View.OnClickList
             getMaskFilter();
         } else if (R.id.remove_tv == v.getId()) {
             if (!TextUtils.isEmpty(filterIdEdittext.getText())) {
-                int filterId = Integer.parseInt(filterIdEdittext.getText().toString());
+                int filterId = Integer.parseInt(filterIdEdittext.getText().toString(), 16);
                 int result = socketCan0.removeMaskFilter(filterId);
                 Log.d(TAG, "removeMaskFilter result : " + result);
                 if (result >= 0) {
                     update();
                     showToast("remove OK");
                 } else {
-                    showToast("remove error");
+                    showToast("filterId is not exist.");
                 }
             } else {
                 showToast("filterId is null.");
@@ -142,6 +148,10 @@ public class MaskFilterActivity extends BaseActivity implements View.OnClickList
         if (!TextUtils.isEmpty(filterId1Str) && !TextUtils.isEmpty(mask1Str)) {
             int filterId1 = StringUtil.HexToInt(filterId1Str, 16);
             int mask1 = StringUtil.HexToInt(mask1Str, 16);
+            if (mask1 == -1) {
+                showToast("input string " + mask1Str + " > 2147483647");
+                return;
+            }
             mask.setFilterId1(filterId1);
             mask.setMask1(mask1);
             if (!checkId(mask.getFilterId1())) {
@@ -152,6 +162,10 @@ public class MaskFilterActivity extends BaseActivity implements View.OnClickList
         if (!TextUtils.isEmpty(filterId2Str) && !TextUtils.isEmpty(mask2Str)) {
             int filterId2 = StringUtil.HexToInt(filterId2Str, 16);
             int mask2 = StringUtil.HexToInt(mask2Str, 16);
+            if (mask2 == -1) {
+                showToast("input string " + mask2Str + " > 2147483647");
+                return;
+            }
             mask.setFilterId2(filterId2);
             mask.setMask2(mask2);
             if (!checkId(mask.getFilterId2())) {
@@ -168,11 +182,11 @@ public class MaskFilterActivity extends BaseActivity implements View.OnClickList
 
     private boolean checkId(int filterId) {
         if (!isExtended && (filterId < 0 || filterId > 0x7FF)) {
-            showToast("can id is error. out of range [0-2047]");
+            showToast("can id is error. out of range [0-0x7FF]");
             return false;
         }
         if (isExtended && (filterId < 0 || filterId > 0x1FFFFFFF)) {
-            showToast("can id is error.out of range [0-536870911]");
+            showToast("can id is error.out of range [0-0x1FFFFFFF]");
             return false;
         }
         return true;
@@ -180,14 +194,18 @@ public class MaskFilterActivity extends BaseActivity implements View.OnClickList
 
     private void getMaskFilter() {
         if (!TextUtils.isEmpty(filterIdEdittext.getText())) {
-            int filterId = StringUtil.HexToInt(filterIdEdittext.getText().toString());
+            int filterId = StringUtil.HexToInt(filterIdEdittext.getText().toString(), 16);
+            if (filterId == -1) {
+                showToast("input string " + filterId + " > 2147483647");
+                return;
+            }
             Mask result = socketCan0.getAllMaskFilter();
             if (result != null) {
                 if (filterId == result.getFilterId1()) {
-                    resultTextView.setText(String.valueOf(result.getMask1()));
+                    resultTextView.setText(String.format("%X", result.getMask1()));
                     showToast("get OK");
                 } else if (filterId == result.getFilterId2()) {
-                    resultTextView.setText(String.valueOf(result.getMask2()));
+                    resultTextView.setText(String.format("%X", result.getMask2()));
                     showToast("get OK");
                 } else {
                     resultTextView.setText("");

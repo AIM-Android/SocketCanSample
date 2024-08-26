@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.ResultReceiver;
+import android.text.InputFilter;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -86,6 +87,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,
 
         canIdEdittext = findViewById(R.id.canid_edt);
         canIdEdittext.setHint("0-7FF");
+        canIdEdittext.setFilters(new InputFilter[] {new InputFilter.LengthFilter(3)});
         canDataEdittext = findViewById(R.id.candata_edt);
 
         baudrateSpinner = findViewById(R.id.baudrate_sp);
@@ -115,6 +117,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,
             onFrameDataReceivedListener = isChecked ? listener : null;
         } else if (R.id.extended_cbx == buttonView.getId()) {
             canIdEdittext.setHint(isChecked ? "0～1FFFFFFF" : "0-7FF");
+            canIdEdittext.setFilters(new InputFilter[] {new InputFilter.LengthFilter(isChecked ? 8 : 3)});
         } else if (R.id.remote_cbx == buttonView.getId()) {
             canDataEdittext.setEnabled(!isChecked);
         }
@@ -251,15 +254,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,
         try {
             canid = Integer.parseInt(canidStr, 16);
         } catch (NumberFormatException e) {
-            showToast(e.getMessage() + " > 2147483647");
+            showToast("input string " + canidStr + " > 2147483647");
             return;
         }
         if (!isExtendedCbx.isChecked() && canid > 0x7FF) {
-            showToast("can id is error. out of range [0-2047]");
+            showToast("can id is error. out of range [0-0x7FF]");
             return;
         }
         if (isExtendedCbx.isChecked() && canid > 0x1FFFFFFF) {
-            showToast("can id is error.out of range [0-536870911]");
+            showToast("can id is error.out of range [0-0x1FFFFFFF]");
             return;
         }
         if (canid > 536870911) {
