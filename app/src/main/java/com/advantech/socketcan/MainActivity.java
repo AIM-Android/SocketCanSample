@@ -294,4 +294,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,
     public void onNothingSelected(AdapterView<?> parent) {
 
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        close();
+    }
 }

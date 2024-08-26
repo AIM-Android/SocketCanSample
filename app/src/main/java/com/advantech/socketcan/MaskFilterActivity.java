@@ -175,9 +175,16 @@ public class MaskFilterActivity extends BaseActivity implements View.OnClickList
         if (!mask.isGroup1Valid() && !mask.isGroup2Valid()) {
             return;
         }
-        socketCan0.setMaskFilter(mask);
-        update();
-        showToast("set OK");
+        int result = socketCan0.setMaskFilter(mask);
+        if (result == ErrorCodeEnum.ERR_INVALID_PARAMETER.getErrorCode()) {
+            showToast("filterId1 is equal filterId2");
+            return;
+        } else if (result >= 0) {
+            update();
+            showToast("set OK");
+        } else {
+            showToast("set failed.");
+        }
     }
 
     private boolean checkId(int filterId) {
