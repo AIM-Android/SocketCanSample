@@ -85,7 +85,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,
         clearResultButton.setOnClickListener(this);
 
         canIdEdittext = findViewById(R.id.canid_edt);
-        canIdEdittext.setHint("0~2047");
+        canIdEdittext.setHint("0-7FF");
         canDataEdittext = findViewById(R.id.candata_edt);
 
         baudrateSpinner = findViewById(R.id.baudrate_sp);
@@ -96,14 +96,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,
         isExtendedCbx = findViewById(R.id.extended_cbx);
         isExtendedCbx.setOnCheckedChangeListener(this);
         isRemoteCbx = findViewById(R.id.remote_cbx);
+        isRemoteCbx.setOnCheckedChangeListener(this);
 
         resultListView = findViewById(R.id.result_list_lv);
+        adapter = new ResultAdapter(this);
+        resultListView.setAdapter(adapter);
     }
 
     @Override
     protected void initData() {
         baudrateArray = getResources().getStringArray(R.array.can_speeds);
-        adapter = new ResultAdapter(this);
         canFrames = new ArrayList<>();
     }
 
@@ -112,7 +114,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,
         if (R.id.callback_cbx == buttonView.getId()) {
             onFrameDataReceivedListener = isChecked ? listener : null;
         } else if (R.id.extended_cbx == buttonView.getId()) {
-            canIdEdittext.setHint(isChecked ? "0～536870911" : "0~2047");
+            canIdEdittext.setHint(isChecked ? "0～1FFFFFFF" : "0-7FF");
+        } else if (R.id.remote_cbx == buttonView.getId()) {
+            canDataEdittext.setEnabled(!isChecked);
         }
     }
 
@@ -177,15 +181,19 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,
         isCallBackModeCbx.setEnabled(true);
         baudrateSpinner.setEnabled(true);
         openCanButton.setText("openCan");
-        socketCan0 = null;
+
         if (thread != null) {
             thread.interrupt();
             thread = null;
         }
+        socketCan0 = null;
         if (manager != null) {
             manager.destroy();
             manager = null;
         }
+
+        canFrames.clear();
+        adapter.notifyDataSetChanged();
     }
 
     private class ReadingThread extends Thread {
@@ -207,10 +215,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                resultListView.setAdapter(adapter);
                 resultListView.post(new Runnable() {
                     @Override
                     public void run() {
+                        adapter.notifyDataSetChanged();
                         resultListView.setSelection(resultListView.getCount() - 1);
                     }
                 });
@@ -224,24 +232,24 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,
             showToast("canid is null.");
             return;
         }
-        if (!canidStr.matches("[0-9]+")) {
+        if (!canidStr.matches("[0-9a-fA-F]+")) {
             showToast("canid format error.");
             return;
         }
         String dataStr = canDataEdittext.getText().toString();
-        if (TextUtils.isEmpty(dataStr)) {
+        if (TextUtils.isEmpty(dataStr) && !isRemoteCbx.isChecked()) {
             showToast("can data is empty.");
             return;
         }
 
-        if ((dataStr.length() > 8)) {
-            showToast("can data length is more than 8.");
+        if ((dataStr.length() % 2 != 0)) {
+            showToast("can data The data must be even.");
             return;
         }
 
         int canid = 0;
         try {
-            canid = Integer.parseInt(canidStr);
+            canid = Integer.parseInt(canidStr, 16);
         } catch (NumberFormatException e) {
             showToast(e.getMessage() + " > 2147483647");
             return;
@@ -258,7 +266,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,
             showToast("can id is error.");
             return;
         }
-        byte[] data = dataStr.getBytes(StandardCharsets.UTF_8);
+//        byte[] data = dataStr.getBytes(StandardCharsets.UTF_8);
+        byte[] data = StringUtil.hexStringToByteArray(dataStr);
         CanFrame canFrame = new CanFrame(canid, data, data.length, isExtendedCbx.isChecked(), isRemoteCbx.isChecked());
         if (isOpened) {
             int result = socketCan0.send(canFrame);

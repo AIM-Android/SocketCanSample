@@ -54,8 +54,8 @@ public class MaskResultAdapter extends BaseAdapter {
         }
         final MaskBean bean = dataList.get(position);
         if (bean != null) {
-            holder.filterIdTv.setText(String.valueOf(bean.getFilterId()));
-            holder.maskTv.setText(String.valueOf(bean.getMask()));
+            holder.filterIdTv.setText(String.format("%X", bean.getFilterId()));
+            holder.maskTv.setText(String.format("%X", bean.getMask()));
         }
         return convertView;
     }

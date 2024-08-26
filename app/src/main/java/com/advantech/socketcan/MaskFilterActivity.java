@@ -69,16 +69,19 @@ public class MaskFilterActivity extends BaseActivity implements View.OnClickList
         adapter = new MaskResultAdapter(this);
         dataList = new ArrayList<>();
 
+        filterId1Edittext.setHint(isExtended ? "0～1FFFFFFF" : "0-7FF");
+        filterId2Edittext.setHint(isExtended ? "0～1FFFFFFF" : "0-7FF");
+
         Mask mask = socketCan0.getAllMaskFilter();
         if (mask == null) {
             return;
         }
         if (mask.isGroup1Valid()) {
-            filterId1Edittext.setText(String.valueOf(mask.getFilterId1()));
+            filterId1Edittext.setText(String.format("%X", mask.getFilterId1()));
             mask1Edittext.setText(Integer.toHexString(mask.getMask1()).toUpperCase());
         }
         if (mask.isGroup2Valid()) {
-            filterId2Edittext.setText(String.valueOf(mask.getFilterId2()));
+            filterId2Edittext.setText(String.format("%X", mask.getFilterId2()));
             mask2Edittext.setText(Integer.toHexString(mask.getMask2()).toUpperCase());
         }
         listView.setAdapter(adapter);
@@ -137,7 +140,7 @@ public class MaskFilterActivity extends BaseActivity implements View.OnClickList
         String filterId2Str = filterId2Edittext.getText().toString();
         String mask2Str = mask2Edittext.getText().toString();
         if (!TextUtils.isEmpty(filterId1Str) && !TextUtils.isEmpty(mask1Str)) {
-            int filterId1 = StringUtil.HexToInt(filterId1Str);
+            int filterId1 = StringUtil.HexToInt(filterId1Str, 16);
             int mask1 = StringUtil.HexToInt(mask1Str, 16);
             mask.setFilterId1(filterId1);
             mask.setMask1(mask1);
@@ -147,7 +150,7 @@ public class MaskFilterActivity extends BaseActivity implements View.OnClickList
         }
 
         if (!TextUtils.isEmpty(filterId2Str) && !TextUtils.isEmpty(mask2Str)) {
-            int filterId2 = StringUtil.HexToInt(filterId2Str);
+            int filterId2 = StringUtil.HexToInt(filterId2Str, 16);
             int mask2 = StringUtil.HexToInt(mask2Str, 16);
             mask.setFilterId2(filterId2);
             mask.setMask2(mask2);
@@ -182,11 +185,16 @@ public class MaskFilterActivity extends BaseActivity implements View.OnClickList
             if (result != null) {
                 if (filterId == result.getFilterId1()) {
                     resultTextView.setText(String.valueOf(result.getMask1()));
+                    showToast("get OK");
                 } else if (filterId == result.getFilterId2()) {
                     resultTextView.setText(String.valueOf(result.getMask2()));
+                    showToast("get OK");
+                } else {
+                    resultTextView.setText("");
+                    showToast("get result is null");
                 }
-                showToast("get OK");
             } else {
+                resultTextView.setText("");
                 showToast("get result is null");
             }
         } else {

@@ -19,6 +19,7 @@
 
             <TextView style="@style/TitleTextViewStyle"
                 android:gravity="center"
+                android:visibility="gone"
                 android:text="@string/txt_receive_box" />
 
             <TableRow style="@style/TableRowStyle">
@@ -58,8 +59,8 @@
 
                 <EditText style="@style/EditTextStyle"
                     android:id="@+id/canid_edt"
-                    android:maxLength="8"
-                    android:inputType="number"
+                    android:digits="0123456789ABCDEF"
+                    android:inputType="textNoSuggestions|textCapCharacters"
                     android:hint="@string/hint_4" />
             </TableRow>
 
@@ -69,7 +70,7 @@
 
                 <EditText style="@style/EditTextStyle"
                     android:id="@+id/candata_edt"
-                    android:maxLength="8"
+                    android:maxLength="16"
                     android:digits="0123456789ABCDEF"
                     android:inputType="textNoSuggestions|textCapCharacters"
                     android:hint="@string/hint_ff_0d_0c_ec" />
@@ -90,6 +91,7 @@
 
             <TextView style="@style/TitleTextViewStyle"
                 android:gravity="center"
+                android:visibility="gone"
                 android:text="@string/txt_receive_box" />
 
             <include layout="@layout/title_item_result"

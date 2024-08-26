@@ -8,7 +8,7 @@
     <TextView
         android:text="@string/item_title_canid"
         android:gravity="center_vertical"
-        android:textSize="16sp"
+        android:textSize="14sp"
         android:textColor="@color/black"
         android:layout_weight="1"
         android:layout_width="0dp"
@@ -18,7 +18,7 @@
     <TextView
         android:text="@string/item_title_len"
         android:gravity="center_vertical"
-        android:textSize="16sp"
+        android:textSize="14sp"
         android:textColor="@color/black"
         android:layout_weight="1"
         android:layout_width="0dp"
@@ -28,9 +28,9 @@
     <TextView
         android:text="@string/item_title_data"
         android:gravity="center_vertical"
-        android:textSize="16sp"
+        android:textSize="14sp"
         android:textColor="@color/black"
-        android:layout_weight="2"
+        android:layout_weight="3"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         tools:ignore="RtlHardcoded" />
@@ -38,7 +38,7 @@
     <TextView
         android:text="@string/item_title_is_extended"
         android:gravity="center_vertical"
-        android:textSize="16sp"
+        android:textSize="14sp"
         android:textColor="@color/black"
         android:layout_weight="1"
         android:layout_width="0dp"
@@ -48,7 +48,7 @@
     <TextView
         android:text="@string/item_title_is_remote"
         android:gravity="center_vertical"
-        android:textSize="16sp"
+        android:textSize="14sp"
         android:textColor="@color/black"
         android:layout_weight="1"
         android:layout_width="0dp"

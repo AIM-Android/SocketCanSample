@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.advantech.socketcan.R;
 import com.advantech.socketcan.CanFrame;
+import com.advantech.socketcan.StringUtil;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -58,9 +59,9 @@ public class ResultAdapter extends BaseAdapter {
         }
         final CanFrame bean = dataList.get(position);
         if (bean != null) {
-            holder.idTv.setText(String.valueOf(bean.getCanId()));
+            holder.idTv.setText(String.format("%X", bean.getCanId()));
             holder.lenTv.setText(String.valueOf(bean.getCanDlc()));
-            String data = new String(bean.getData(), StandardCharsets.UTF_8)
+            String data = StringUtil.byteArrayToHexString(bean.getData())
                     .replaceAll("(.{2})", "$1 ")
                     .replaceAll(" $", "");
             holder.dataTv.setText(data);

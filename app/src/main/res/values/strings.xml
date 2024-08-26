@@ -28,7 +28,7 @@
     <string name="txt_getmask">getMask</string>
     <string name="hint_result">result</string>
     <string name="hint_0x7ff">7FF</string>
-    <string name="hint_123">123</string>
+    <string name="hint_123">13</string>
     <string name="item_title_canid">canId</string>
     <string name="item_title_len">len</string>
     <string name="item_title_data">data</string>
