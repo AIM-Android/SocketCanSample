@@ -214,18 +214,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,
         }
         Log.d(TAG, "updateResult : " + canFrame.toString());
         canFrames.add(canFrame);
-        adapter.setDataList(canFrames);
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                resultListView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        adapter.notifyDataSetChanged();
-                        resultListView.setSelection(resultListView.getCount() - 1);
-                    }
-                });
-            }
+        runOnUiThread(() -> {
+            adapter.setDataList(canFrames);
+            adapter.notifyDataSetChanged();
+            resultListView.setSelection(resultListView.getCount() - 1);
         });
     }
 
