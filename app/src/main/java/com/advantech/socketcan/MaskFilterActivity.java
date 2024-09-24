@@ -126,6 +126,8 @@ public class MaskFilterActivity extends BaseActivity implements View.OnClickList
         Mask result = socketCan0.getAllMaskFilter();
         dataList.clear();
         if (result == null) {
+            adapter.setDataList(dataList);
+            listView.setAdapter(adapter);
             return;
         }
         if (result.isGroup1Valid()) {
@@ -145,6 +147,11 @@ public class MaskFilterActivity extends BaseActivity implements View.OnClickList
         String mask1Str = mask1Edittext.getText().toString();
         String filterId2Str = filterId2Edittext.getText().toString();
         String mask2Str = mask2Edittext.getText().toString();
+        if (TextUtils.isEmpty(filterId1Str) && TextUtils.isEmpty(mask1Str)
+                && TextUtils.isEmpty(filterId2Str) && TextUtils.isEmpty(mask2Str)) {
+            showToast("mask filter is null");
+            return;
+        }
         if (!TextUtils.isEmpty(filterId1Str) && !TextUtils.isEmpty(mask1Str)) {
             int filterId1 = StringUtil.HexToInt(filterId1Str, 16);
             int mask1 = StringUtil.HexToInt(mask1Str, 16);
@@ -155,6 +162,9 @@ public class MaskFilterActivity extends BaseActivity implements View.OnClickList
             mask.setFilterId1(filterId1);
             mask.setMask1(mask1);
             if (!checkId(mask.getFilterId1())) {
+                return;
+            }
+            if (!checkMaskId(mask.getMask1())) {
                 return;
             }
         }
@@ -171,13 +181,20 @@ public class MaskFilterActivity extends BaseActivity implements View.OnClickList
             if (!checkId(mask.getFilterId2())) {
                 return;
             }
+            if (!checkMaskId(mask.getMask2())) {
+                return;
+            }
         }
         if (!mask.isGroup1Valid() && !mask.isGroup2Valid()) {
             return;
         }
+        if (mask.getFilterId1() == mask.getFilterId2()) {
+            showToast("filterId1 equals filterId2");
+            return;
+        }
         int result = socketCan0.setMaskFilter(mask);
         if (result == ErrorCodeEnum.ERR_INVALID_PARAMETER.getErrorCode()) {
-            showToast("filterId1 is equal filterId2");
+            showToast("mask is not invalid");
             return;
         } else if (result >= 0) {
             update();
@@ -185,6 +202,14 @@ public class MaskFilterActivity extends BaseActivity implements View.OnClickList
         } else {
             showToast("set failed.");
         }
+    }
+
+    private boolean checkMaskId(int maskId) {
+        if (maskId < 0 || maskId > 0x1FFFFFFF) {
+            showToast("mask id is error. out of range [0-0x1FFFFFFF]");
+            return false;
+        }
+        return true;
     }
 
     private boolean checkId(int filterId) {
