@@ -18,7 +18,10 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.advantech.socketcan.adapter.ResultAdapter;
 import com.advantech.socketcan.baseui.BaseActivity;
@@ -43,10 +46,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,
     private EditText canIdEdittext, canDataEdittext;
     private CheckBox isCallBackModeCbx, isExtendedCbx, isRemoteCbx;
     private Spinner baudrateSpinner;
-    private ListView resultListView;
+    private RecyclerView mRecyclerView;
 
     private ResultAdapter adapter;
-    private List<CanFrame> canFrames;
+    private List<CanFrame> canFrames = new ArrayList<>();;
 
     private boolean isOpened;
 
@@ -100,15 +103,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,
         isRemoteCbx = findViewById(R.id.remote_cbx);
         isRemoteCbx.setOnCheckedChangeListener(this);
 
-        resultListView = findViewById(R.id.result_list_lv);
-        adapter = new ResultAdapter(this);
-        resultListView.setAdapter(adapter);
+        mRecyclerView = findViewById(R.id.result_list_lv);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(layoutManager);
+        adapter = new ResultAdapter(this, canFrames);
+        mRecyclerView.setAdapter(adapter);
     }
 
     @Override
     protected void initData() {
         baudrateArray = getResources().getStringArray(R.array.can_speeds);
-        canFrames = new ArrayList<>();
     }
 
     @Override
@@ -213,11 +217,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,
             return;
         }
         Log.d(TAG, "updateResult : " + canFrame.toString());
-        canFrames.add(canFrame);
-        runOnUiThread(() -> {
-            adapter.setDataList(canFrames);
-            adapter.notifyDataSetChanged();
-            resultListView.setSelection(resultListView.getCount() - 1);
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                canFrames.add(canFrame);
+                adapter.notifyItemInserted(canFrames.size() - 1);
+                mRecyclerView.scrollToPosition(canFrames.size() - 1);
+            }
         });
     }
 

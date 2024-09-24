@@ -98,11 +98,12 @@
                 android:layout_marginHorizontal="4dp"
                 android:layout_weight="1"
                 android:layout_width="match_parent"
-                android:layout_height="0dp" />
+                android:layout_height="0dp"
+                tools:ignore="NestedWeights" />
 
-            <ListView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/result_list_lv"
-                android:layout_margin="4dp"
+                android:layout_marginHorizontal="4dp"
                 android:layout_weight="7"
                 android:layout_width="match_parent"
                 android:layout_height="0dp" />

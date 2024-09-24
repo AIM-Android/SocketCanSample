@@ -1,63 +1,45 @@
 package com.advantech.socketcan.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.advantech.socketcan.R;
 import com.advantech.socketcan.CanFrame;
 import com.advantech.socketcan.StringUtil;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-public class ResultAdapter extends BaseAdapter {
+public class ResultAdapter extends RecyclerView.Adapter<ResultAdapter.ViewHolder> {
+
+    private static final String TAG = ResultAdapter.class.getSimpleName();
 
     private final Context context;
     private List<CanFrame> dataList;
 
-    public void setDataList(List<CanFrame> dataList) {
+    public ResultAdapter(Context context, List<CanFrame> dataList) {
+        this.context = context;
         this.dataList = dataList;
     }
 
-    public ResultAdapter(Context context) {
-        this.context = context;
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_result, parent, false);
+        final ViewHolder holder = new ViewHolder(view);
+        return holder;
     }
 
     @Override
-    public int getCount() {
-        return dataList == null ? 0 : dataList.size();
-    }
-
-    @Override
-    public Object getItem(int position) {
-        return dataList == null ? null : dataList.get(position);
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder = null;
-        if (convertView == null) {
-            convertView = LayoutInflater.from(context).inflate(R.layout.item_result, null);
-            holder = new ViewHolder();
-            holder.idTv = convertView.findViewById(R.id.canid_tv);
-            holder.lenTv = convertView.findViewById(R.id.can_len_tv);
-            holder.dataTv = convertView.findViewById(R.id.can_data_tv);
-            holder.extendedTv = convertView.findViewById(R.id.extended_tv);
-            holder.remoteTv = convertView.findViewById(R.id.remote_tv);
-            convertView.setTag(holder);
-        } else {
-            holder = (ViewHolder) convertView.getTag();
-        }
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final CanFrame bean = dataList.get(position);
+        Log.d(TAG, "bean : " + bean.toString());
         if (bean != null) {
             holder.idTv.setText(String.format("%X", bean.getCanId()));
             holder.lenTv.setText(String.valueOf(bean.getCanDlc()));
@@ -68,14 +50,27 @@ public class ResultAdapter extends BaseAdapter {
             holder.extendedTv.setText(String.valueOf(bean.isExtended()));
             holder.remoteTv.setText(String.valueOf(bean.isRemote()));
         }
-        return convertView;
     }
 
-    private static class ViewHolder {
+    @Override
+    public int getItemCount() {
+        return dataList == null ? 0 : dataList.size();
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView idTv;
         TextView lenTv;
         TextView dataTv;
         TextView extendedTv;
         TextView remoteTv;
+
+        public ViewHolder(@NonNull View itemView) {
+            super(itemView);
+            idTv = itemView.findViewById(R.id.canid_tv);
+            lenTv = itemView.findViewById(R.id.can_len_tv);
+            dataTv = itemView.findViewById(R.id.can_data_tv);
+            extendedTv = itemView.findViewById(R.id.extended_tv);
+            remoteTv = itemView.findViewById(R.id.remote_tv);
+        }
     }
 }
