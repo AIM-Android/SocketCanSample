@@ -1,12 +1,11 @@
 # 介绍
-
 ## libSocketCan SDK 概述
 
-libSocketCan SDK 是一组控制 imx8m tpc_1xx 安卓设备 CAN 总线的 API 开发库，包括(配置、打开、关闭、发送和接收 CAN 数据帧)，SocketCan 仅支持 can0 接口的控制
+libSocketCan SDK 是一组控制 imx8m tpc_1xx 安卓设备 CAN 总线的 API 开发库，包括(配置、打开、关闭、发送和接收 CAN 数据帧、设置滤波)，SocketCan 仅支持 can0 接口的控制
 
 libSocketCan SDK 为应用程序提供 API 模块，用于控制 CAN 进行各种操作，该 SDK 的软件栈如下图所示
 
-![](https://github.com/AIM-Android/SocketCanSample/blob/master/images/image-20240718115511123.png)
+![image-20240717113412643](/home/zhangjian/Desktop/libSocketCan/images/image-20240718115511123.png)
 
 libSocketCan API 主要包括两个部分
 
@@ -19,13 +18,13 @@ libSocketCan API 主要包括两个部分
 
 我们导入成功 libSocketCan SDK 之后，就可以开始开发我们的 app，具体的使用流程如下图所示
 
-![](https://github.com/AIM-Android/SocketCanSample/blob/master/images/image-20240717114849850.png)
+![image-20240924102205307](/home/zhangjian/Desktop/libSocketCan/images/image-20240924102205307.png)
 
 ## 在 Android Studio 中导入 SDK
 
 要使用 application 访问 libSocketCan 的功能，您必须将 libSocketCan.jar 和 libSocketCan.so 导入到您的 AndroidStudio 工程中。对应的目录及配置如下图所示。
 
-![](https://github.com/AIM-Android/SocketCanSample/blob/master/images/image-20240717105744169.png)
+![image-20240717105744169](/home/zhangjian/Desktop/libSocketCan/images/image-20240717105744169.png)
 
 
 
@@ -41,9 +40,10 @@ libSocketCan API 主要包括两个部分
 
 | 类名                                        | 变量成员                                                     | 方法成员                                                     |
 | :------------------------------------------ | :----------------------------------------------------------- | ------------------------------------------------------------ |
-| **<a id="CanFrame">CanFrame</a>**           | *can id*<br>**public int canId**<br>*can data 是一个 byte 数组*<br>**public byte[] data**<br>*can data length 数据长度*<br>**public int canDlc** | *构造方法*<br>**public CanFrame(int canId, byte[] data, int canDlc)** |
-| **<a id="ErrorCodeEnum">ErrorCodeEnum</a>** | *数据发送失败*<br>**ERR_SEND_FAIL**<br>*参数解析错误*<br>**ERR_INVALID_ARGUMENT**<br/>*can data 数据长度匹配错误*<br>**ERR_MISSING_CAN_DLC**<br/>*没有找到目标类*<br>**ERR_NOT_FIND_CLASS**<br/>*数据解析错误*<br>**ERR_PARSING_DATA**<br/>*打开或关闭 socket fd 错误*<br>**ERR_FD_STATUS**<br/>*bind socket failed*<br>**ERR_BIND_SOCKET**<br/>*端口没有打开*<br>**ERR_SOCKET_NOT_OPEN**<br>*错误码*<br>**private final int errorCode**<br>*对应错误码的描述*<br>**private final String value** | *根据错误码获取描述*<br>**public static String getValue(int errorCode)** |
-| **SocketCan**                               | **private Context mContext**<br>**private boolean isOpened**<br>**private int mSocketFd**<br/>**private int mPort**<br/>**private String mSpeed**<br/>**private Map<Integer, [Mask](#Mask)> maskFilters**<br>**private [OnFrameDataReceivedListener](#OnFrameDataReceivedListener) mDataReceivedListener** | *构造函数，用于构造 SokcetCan 实例*<br>**public SocketCan(Context context, [OnFrameDataReceivedListener](#OnFrameDataReceivedListener) listener)**<br>*打开 can 接口*<br/>**public synchronized int open(int port, String speed)**<br/>关闭 can0 接口<br/>**public synchronized int close()**<br/>发送数据帧<br/>**public int send([CanFrame](#CanFrame) frame)**<br/>接收数据<br/>**public [CanFrame](#CanFrame) recv()** |
+| **<a id="CanFrame">CanFrame</a>**           | *can id*<br>**private int canId**<br>*can data 是一个 byte 数组*<br>**private byte[] data**<br>*can data length 数据长度*<br>**private int canDlc**<br>*extended frame 扩展帧*<br>**private boolean isExtended**<br>*remote frame 远程帧*<br>**private boolean isRemote** | *构造方法*<br>**public CanFrame(int canId, byte[] data, int canDlc, boolean isExtended, boolean isRemote)** |
+| **<a id="ErrorCodeEnum">ErrorCodeEnum</a>** | *数据发送失败*<br>**ERR_SEND_FAIL**<br>*参数解析错误*<br>**ERR_INVALID_ARGUMENT**<br/>*can data 数据长度匹配错误*<br>**ERR_MISSING_CAN_DLC**<br/>*没有找到目标类*<br>**ERR_NOT_FIND_CLASS**<br/>*数据解析错误*<br>**ERR_PARSING_DATA**<br/>*打开或关闭 socket fd 错误*<br>**ERR_FD_STATUS**<br/>*bind socket failed*<br>**ERR_BIND_SOCKET**<br/>*端口没有打开*<br>**ERR_SOCKET_NOT_OPEN**<br>*can id out of range *<br>**ERR_CAN_ID_OUT_OF_RANGE**<br>*错误码*<br>**private final int errorCode**<br>*对应错误码的描述*<br>**private final String value** | *根据错误码获取描述*<br>**public static String getValue(int errorCode)** |
+| **<a id="Mask">Mask</a>**                   | **private int filterId1**<br>**private int mask1**<br>**private int filterId2**<br>**private int mask2** | *判断第一组滤波是否有效*<br>**public boolean isGroup1Valid()**<br>*判断第二组滤波是否有效*<br>**public boolean isGroup2Valid()** |
+| **SocketCan**                               | **private Context mContext**<br>**private boolean isOpened**<br>**private int mSocketFd**<br/>**private int mPort**<br/>**private String mSpeed**<br/>**private [Mask](#Mask) maskFilter**<br>**private [OnFrameDataReceivedListener](#OnFrameDataReceivedListener) mDataReceivedListener** | *构造函数，用于构造 SokcetCan 实例*<br>**public SocketCan(Context context, [OnFrameDataReceivedListener](#OnFrameDataReceivedListener) listener)**<br>*打开 can 接口*<br/>**public synchronized int [open](#open)(int port, String speed)**<br/>关闭 can0 接口<br/>**public synchronized int [close](#close)()**<br/>发送数据帧<br/>**public int [send](#send)([CanFrame](#CanFrame) frame)**<br/>接收数据<br/>**public [CanFrame](#CanFrame) [recv](#recv)()**<br>设置滤波<br>**public int [setMaskFilter](#setMaskFilter)(Mask mask)**<br>移除滤波<br>**public int [removeMaskFilter](#removeMaskFilter)(int maskId)**<br>获取滤波<br>**public Mask [getAllMaskFilter](#getAllMaskFilter)()**<br>重置滤波<br>**public int [clearAndResetMaskFilter](#clearAndResetMaskFilter)()** |
 
 ## 函数方法
 
@@ -69,7 +69,7 @@ none
 
 - Remarks
 
-none
+如果传入的第二个参数listener为null，这时候需要代码主动监听数据，需要在can 接口打开成功后，手动开启 ReadingThread 线程
 
 #### <a id="open">open</a>
 
@@ -166,3 +166,89 @@ none
 - Remarks
 
 调用该函数需要其一个读线程，一直监听数据
+
+#### <a id="setMaskFilter">setMaskFilter</a>
+
+- Syntax
+
+```java
+public int setMaskFilter(Mask mask)
+```
+
+- Description
+
+设置滤波 Mask
+
+- Parameters
+
+[mask](#Mask)
+
+- Returns
+
+设置成功返回0
+
+#### <a id="removeMaskFilter">removeMaskFilter</a>
+
+- Syntax
+
+```java
+public int removeMaskFilter(int filterId)
+```
+
+- Description
+
+移除已经设置过的Mask，
+
+- Parameters
+
+参数传入 filterId
+
+- Returns
+
+移除成功则返回 0
+
+#### <a id="getAllMaskFilter">getAllMaskFilter</a>
+
+- Syntax
+
+```java
+public Mask getAllMaskFilter()
+```
+
+- Description
+
+获取设置的所有滤波
+
+- Parameters
+
+none
+
+- Returns
+
+[Mask](#Mask)
+
+#### <a id="clearAndResetMaskFilter">clearAndResetMaskFilter</a>
+
+- Syntax
+
+```java
+public int clearAndResetMaskFilter()
+```
+
+- Description
+
+重置滤波
+
+- Parameters
+
+none
+
+- Returns
+
+成功则返回 0
+
+
+
+## 代码参考
+
+*详细使用请参考 [SocketCanSample code](https://github.com/AIM-Android/SocketCanSample)*
